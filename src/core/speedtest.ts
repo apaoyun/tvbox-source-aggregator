@@ -179,6 +179,7 @@ function getTestableUrl(site: TVBoxSite): string | null {
   const api = site.api || '';
 
   if (site.type === 1) {
+    if (!api.startsWith('http')) return null;
     return api.includes('?') ? `${api}&ac=list` : `${api}?ac=list`;
   }
 
