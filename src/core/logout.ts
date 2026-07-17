@@ -1,4 +1,11 @@
-const logoutPageHtml = `
+// 后台页面
+app.get('/ckadmin', (c) => {
+  return c.html(adminHtml);
+});
+
+// 退出确认页面（统一主题）
+app.get('/ckadmin/logout-confirm', (c) => {
+  const logoutPageHtml = `
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="${localStorage.getItem('theme')||'dark'}">
 <head>
@@ -78,10 +85,8 @@ const token = localStorage.getItem('adminToken');
 const cancelBtn = document.getElementById('cancelBtn');
 const confirmBtn = document.getElementById('confirmBtn');
 
-// 取消返回后台
 cancelBtn.onclick = () => window.location.href = '/ckadmin';
 
-// 确认登出
 confirmBtn.onclick = async () => {
   try {
     await fetch('/ckadmin/logout', {
@@ -99,4 +104,17 @@ confirmBtn.onclick = async () => {
 </script>
 </body>
 </html>
-`;
+  `;
+  return c.html(logoutPageHtml);
+});
+
+// 登出接口（使用你现有的 verifyAdmin 鉴权）
+app.post('/ckadmin/logout', async (c) => {
+  const req = c.req.raw;
+  const cfg = c.env.APP_CONFIG;
+  const authorized = verifyAdmin(req, cfg);
+  if (!authorized) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+  return c.json({ success: true, msg: '登出完成' });
+});
