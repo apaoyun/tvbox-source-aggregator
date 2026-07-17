@@ -273,7 +273,7 @@ ${sharedStyles}
     </div>
     <h1 class="header-title">TVBox <span>Config</span></h1>
     <div class="header-nav">
-      <a href="/admin" data-i18n="navAdmin">Admin</a>
+      <a href="/ckadmin" data-i18n="navAdmin">Admin</a>
       <a href="/builder">Builder</a>
       <a href="/status" data-i18n="navDashboard">Dashboard</a>
     </div>
@@ -418,7 +418,7 @@ let TOKEN = '';
 let DATA = null;
 let CURRENT_TAB = 'sites';
 
-const auth = initAuth('tokenInput', 'loginError', 'loginOverlay', 'mainContent', '/admin/config-data', function() {
+const auth = initAuth('tokenInput', 'loginError', 'loginOverlay', 'mainContent', '/ckadmin/config-data', function() {
   TOKEN = auth.getToken();
   loadData();
 });
@@ -461,7 +461,7 @@ function groupSites(sites) {
 
 async function loadData() {
   try {
-    const res = await fetch('/admin/config-data', {
+    const res = await fetch('/ckadmin/config-data', {
       headers: { 'Authorization': 'Bearer ' + TOKEN }
     });
     if (res.status === 401) {
@@ -628,7 +628,7 @@ function doSearch() {
 
 async function block(type, id) {
   try {
-    const res = await fetch('/admin/blacklist', {
+    const res = await fetch('/ckadmin/blacklist', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, id })
@@ -652,7 +652,7 @@ async function block(type, id) {
 
 async function unblock(type, id) {
   try {
-    const res = await fetch('/admin/blacklist', {
+    const res = await fetch('/ckadmin/blacklist', {
       method: 'DELETE',
       headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, id })
@@ -727,7 +727,7 @@ async function batchBlock() {
   try {
     for (const type of Object.keys(byType)) {
       const ids = byType[type];
-      const res = await fetch('/admin/blacklist/batch', {
+      const res = await fetch('/ckadmin/blacklist/batch', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, ids })
@@ -749,7 +749,7 @@ async function batchBlock() {
 // ─── Regex Rules ──────────────
 async function loadRegexRules() {
   try {
-    const r = await fetch('/admin/blacklist/regex', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const r = await fetch('/ckadmin/blacklist/regex', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
     const d = await r.json();
     const el = document.getElementById('regexRulesList');
     const badge = document.getElementById('badgeRegex');
@@ -774,18 +774,18 @@ async function addRegexRule() {
   var pattern = document.getElementById('regexPattern').value.trim();
   var field = document.getElementById('regexField').value;
   if (!pattern) return;
-  var r = await fetch('/admin/blacklist/regex', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body: JSON.stringify({pattern:pattern, field:field, enabled:true}) });
+  var r = await fetch('/ckadmin/blacklist/regex', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body: JSON.stringify({pattern:pattern, field:field, enabled:true}) });
   var d = await r.json();
   if (d.error) { alert(d.error); return; }
   document.getElementById('regexPattern').value = '';
   loadRegexRules();
 }
 async function deleteRegexRule(id) {
-  await fetch('/admin/blacklist/regex/' + id, { method:'DELETE', headers:{'Authorization':'Bearer '+TOKEN} });
+  await fetch('/ckadmin/blacklist/regex/' + id, { method:'DELETE', headers:{'Authorization':'Bearer '+TOKEN} });
   loadRegexRules();
 }
 async function toggleRegexRule(id, enabled) {
-  await fetch('/admin/blacklist/regex/' + id, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body: JSON.stringify({enabled:enabled}) });
+  await fetch('/ckadmin/blacklist/regex/' + id, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body: JSON.stringify({enabled:enabled}) });
   loadRegexRules();
 }
 async function testRegexRule() {
@@ -795,7 +795,7 @@ async function testRegexRule() {
   var el = document.getElementById('regexTestResult');
   el.style.display = 'block';
   el.textContent = _t('regexTesting');
-  var r = await fetch('/admin/blacklist/regex/test', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body: JSON.stringify({pattern:pattern, field:field}) });
+  var r = await fetch('/ckadmin/blacklist/regex/test', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body: JSON.stringify({pattern:pattern, field:field}) });
   var d = await r.json();
   if (d.error) { el.textContent = _t('regexError') + d.error; el.style.color = 'var(--red)'; return; }
   el.style.color = 'var(--text-dim)';

@@ -13,7 +13,7 @@ import { validateMacCMS } from './core/maccms';
 import { lookupJarUrl, isMd5Key, base64ToUint8Array, rewriteJarUrls } from './core/jar-proxy';
 import { BASE_URL_PLACEHOLDER } from './core/config';
 import { lookupLiveUrl } from './core/live-source';
-import { adminHtml } from './core/admin';
+import { adminHtml } from './core/ckadmin';
 import { dashboardHtml } from './core/dashboard';
 import { configEditorHtml } from './core/config-editor';
 import { siteFingerprint, loadBlacklist, saveBlacklist, saveRegexRule, deleteRegexRule, updateRegexRule, validateRegexRule, testRegexAgainstSites, applyBlacklist } from './core/blacklist';
@@ -114,12 +114,12 @@ export function createApp(deps: AppDeps): Hono {
   }
 
   // ─── 主配置 ────────────────────────────────────────────
-  app.get('/live', async (c) => {
+  app.get('/', async (c) => {
     let cached = await storage.get(KV_MERGED_CONFIG);
 
     if (!cached) {
       return c.json(
-        { error: 'No config available yet. Add sources in /admin and trigger a refresh.' },
+        { error: 'No config available yet. Add sources in /ckadmin and trigger a refresh.' },
         503,
       );
     }
@@ -136,7 +136,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 纯直播配置 ────────────────────────────────────────
-  app.get('/live-apao', async (c) => {
+  app.get('/live-config', async (c) => {
     let cached = await storage.get(KV_MERGED_CONFIG);
 
     if (!cached) {
@@ -280,12 +280,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── Admin 页面 ────────────────────────────────────────
-  app.get('/admin', (c) => {
+  app.get('/ckadmin', (c) => {
     return c.html(adminHtml);
   });
 
   // ─── Admin API（需鉴权）────────────────────────────────
-  app.get('/admin/sources', async (c) => {
+  app.get('/ckadmin/sources', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -294,7 +294,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json(sources);
   });
 
-  app.post('/admin/sources', async (c) => {
+  app.post('/ckadmin/sources', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -339,7 +339,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true });
   });
 
-  app.delete('/admin/sources', async (c) => {
+  app.delete('/ckadmin/sources', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -363,7 +363,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── JSON 导入 ─────────────────────────────────────────
-  app.post('/admin/sources/import', async (c) => {
+  app.post('/ckadmin/sources/import', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -461,7 +461,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 名称定制 API ──────────────────────────────────────
-  app.get('/admin/name-transform', async (c) => {
+  app.get('/ckadmin/name-transform', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -470,7 +470,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json(transform);
   });
 
-  app.put('/admin/name-transform', async (c) => {
+  app.put('/ckadmin/name-transform', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -503,7 +503,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 定时任务间隔 API ──────────────────────────────────
-  app.get('/admin/cron-interval', async (c) => {
+  app.get('/ckadmin/cron-interval', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -512,7 +512,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ interval });
   });
 
-  app.put('/admin/cron-interval', async (c) => {
+  app.put('/ckadmin/cron-interval', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -540,7 +540,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 站点测速开关 ──────────────────────────────────────
-  app.get('/admin/speed-test', async (c) => {
+  app.get('/ckadmin/speed-test', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -548,7 +548,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ enabled: raw !== 'false' });
   });
 
-  app.put('/admin/speed-test', async (c) => {
+  app.put('/ckadmin/speed-test', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -569,13 +569,13 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 边缘函数代理配置 Admin API ──────────────────────
-  app.get('/admin/edge-proxies', async (c) => {
+  app.get('/ckadmin/edge-proxies', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const raw = await storage.get(KV_EDGE_PROXIES);
     return c.json(raw ? JSON.parse(raw) : {});
   });
 
-  app.put('/admin/edge-proxies', async (c) => {
+  app.put('/ckadmin/edge-proxies', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: { cf?: string; vercel?: string };
     try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON' }, 400); }
@@ -626,13 +626,13 @@ export function createApp(deps: AppDeps): Hono {
   }
 
   // ─── 搜索配额管理 ──────────────────────────────────────
-  app.get('/admin/search-quota', async (c) => {
+  app.get('/ckadmin/search-quota', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const quota = await loadSearchQuota(storage);
     return c.json(quota);
   });
 
-  app.put('/admin/search-quota', async (c) => {
+  app.put('/ckadmin/search-quota', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: Partial<SearchQuotaConfig>;
     try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON' }, 400); }
@@ -645,7 +645,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, ...current });
   });
 
-  app.post('/admin/search-quota/pinned', async (c) => {
+  app.post('/ckadmin/search-quota/pinned', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: { keys?: string[] };
     try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON' }, 400); }
@@ -660,7 +660,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 重排 pinned 顺序（整体替换）
-  app.put('/admin/search-quota/pinned', async (c) => {
+  app.put('/ckadmin/search-quota/pinned', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: { keys?: string[] };
     try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON' }, 400); }
@@ -672,7 +672,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, pinnedKeys: current.pinnedKeys });
   });
 
-  app.delete('/admin/search-quota/pinned', async (c) => {
+  app.delete('/ckadmin/search-quota/pinned', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: { keys?: string[] };
     try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON' }, 400); }
@@ -686,7 +686,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 报告（admin 需鉴权）
-  app.get('/admin/search-quota/report', async (c) => {
+  app.get('/ckadmin/search-quota/report', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const raw = await storage.get(KV_SEARCH_QUOTA_REPORT);
     if (!raw) return c.json({ error: 'No report yet. Run aggregation first.' }, 404);
@@ -703,7 +703,7 @@ export function createApp(deps: AppDeps): Hono {
   // ─── 网盘凭证管理 API ───────────────────────────────────
 
   // 查看所有已登录平台状态
-  app.get('/admin/cloud-credentials', async (c) => {
+  app.get('/ckadmin/cloud-credentials', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const creds = await loadCredentials(storage);
     const result: Record<string, any> = {};
@@ -720,7 +720,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 注销指定平台
-  app.delete('/admin/cloud-credentials/:platform', async (c) => {
+  app.delete('/ckadmin/cloud-credentials/:platform', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const platform = c.req.param('platform') as CloudPlatform;
     if (!PLATFORM_NAMES[platform]) return c.json({ error: 'Unknown platform' }, 400);
@@ -729,7 +729,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 手动粘贴凭证
-  app.post('/admin/cloud-credentials/:platform', async (c) => {
+  app.post('/ckadmin/cloud-credentials/:platform', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const platform = c.req.param('platform') as CloudPlatform;
     if (!PLATFORM_NAMES[platform]) return c.json({ error: 'Unknown platform' }, 400);
@@ -751,7 +751,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 生成二维码
-  app.post('/admin/cloud-login/:platform/qr', async (c) => {
+  app.post('/ckadmin/cloud-login/:platform/qr', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const platform = c.req.param('platform') as CloudPlatform;
     if (!QR_PLATFORMS.includes(platform)) {
@@ -768,7 +768,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 轮询扫码状态
-  app.get('/admin/cloud-login/:platform/poll', async (c) => {
+  app.get('/ckadmin/cloud-login/:platform/poll', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const platform = c.req.param('platform') as CloudPlatform;
     const token = c.req.query('token');
@@ -796,7 +796,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 密码登录（迅雷/PikPak）
-  app.post('/admin/cloud-login/:platform/password', async (c) => {
+  app.post('/ckadmin/cloud-login/:platform/password', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const platform = c.req.param('platform') as CloudPlatform;
     if (!PASSWORD_PLATFORMS.includes(platform)) {
@@ -825,12 +825,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 凭证注入策略
-  app.get('/admin/credential-policy', async (c) => {
+  app.get('/ckadmin/credential-policy', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     return c.json(await loadCredentialPolicy(storage));
   });
 
-  app.put('/admin/credential-policy', async (c) => {
+  app.put('/ckadmin/credential-policy', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: { allowedHighRiskKeys?: string[]; deniedKeys?: string[] };
     try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON' }, 400); }
@@ -843,7 +843,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // 风险分级报告
-  app.get('/admin/credential-risk-report', async (c) => {
+  app.get('/ckadmin/credential-risk-report', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const configRaw = await storage.get(KV_MERGED_CONFIG_FULL);
     if (!configRaw) return c.json({ error: 'No config available. Run aggregation first.' }, 404);
@@ -1177,7 +1177,7 @@ export function createApp(deps: AppDeps): Hono {
   }
 
   // ─── Live Sources Admin API ────────────────────────────
-  app.get('/admin/lives', async (c) => {
+  app.get('/ckadmin/lives', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1186,7 +1186,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json(entries);
   });
 
-  app.post('/admin/lives', async (c) => {
+  app.post('/ckadmin/lives', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1221,7 +1221,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true });
   });
 
-  app.delete('/admin/lives', async (c) => {
+  app.delete('/ckadmin/lives', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1245,7 +1245,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── MacCMS Admin API ─────────────────────────────────
-  app.get('/admin/maccms', async (c) => {
+  app.get('/ckadmin/maccms', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1254,7 +1254,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json(sources);
   });
 
-  app.post('/admin/maccms', async (c) => {
+  app.post('/ckadmin/maccms', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1297,7 +1297,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, added, total: sources.length });
   });
 
-  app.delete('/admin/maccms', async (c) => {
+  app.delete('/ckadmin/maccms', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1320,7 +1320,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true });
   });
 
-  app.post('/admin/maccms/validate', async (c) => {
+  app.post('/ckadmin/maccms/validate', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1340,12 +1340,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── Config Editor 页面 ─────────────────────────────────
-  app.get('/admin/config-editor', (c) => {
+  app.get('/ckadmin/config-editor', (c) => {
     return c.html(configEditorHtml);
   });
 
   // ─── Config Editor API ─────────────────────────────────
-  app.get('/admin/config-data', async (c) => {
+  app.get('/ckadmin/config-data', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1413,7 +1413,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ sites, parses, lives });
   });
 
-  app.post('/admin/blacklist', async (c) => {
+  app.post('/ckadmin/blacklist', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1442,7 +1442,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true });
   });
 
-  app.post('/admin/blacklist/batch', async (c) => {
+  app.post('/ckadmin/blacklist/batch', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1480,7 +1480,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, added });
   });
 
-  app.delete('/admin/blacklist', async (c) => {
+  app.delete('/ckadmin/blacklist', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1540,13 +1540,13 @@ export function createApp(deps: AppDeps): Hono {
   }
 
   // ─── 正则黑名单 ─────────────────────────────────────────
-  app.get('/admin/blacklist/regex', async (c) => {
+  app.get('/ckadmin/blacklist/regex', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const blacklist = await loadBlacklist(storage);
     return c.json({ rules: blacklist.regexRules, overrides: blacklist.regexBlockOverrides });
   });
 
-  app.post('/admin/blacklist/regex', async (c) => {
+  app.post('/ckadmin/blacklist/regex', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     if (deps.isSyncing?.()) return c.json({ error: 'Aggregation in progress, try later' }, 409);
     const body = await c.req.json<{ pattern: string; field: 'name' | 'api' | 'key'; enabled?: boolean }>();
@@ -1568,7 +1568,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, rule });
   });
 
-  app.put('/admin/blacklist/regex/:id', async (c) => {
+  app.put('/ckadmin/blacklist/regex/:id', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     if (deps.isSyncing?.()) return c.json({ error: 'Aggregation in progress, try later' }, 409);
     const id = c.req.param('id');
@@ -1587,7 +1587,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true });
   });
 
-  app.delete('/admin/blacklist/regex/:id', async (c) => {
+  app.delete('/ckadmin/blacklist/regex/:id', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const id = c.req.param('id');
     const blacklist = await loadBlacklist(storage);
@@ -1597,7 +1597,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true });
   });
 
-  app.post('/admin/blacklist/regex/test', async (c) => {
+  app.post('/ckadmin/blacklist/regex/test', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const body = await c.req.json<{ pattern: string; field: 'name' | 'api' | 'key' }>();
     if (!body.pattern || !['name', 'api', 'key'].includes(body.field)) {
@@ -1613,7 +1613,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 聚合日志 ──────────────────────────────────────────
-  app.get('/admin/agg-logs', async (c) => {
+  app.get('/ckadmin/agg-logs', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1625,7 +1625,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ total: logs.length, logs: sliced });
   });
 
-  app.delete('/admin/agg-logs', async (c) => {
+  app.delete('/ckadmin/agg-logs', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1634,7 +1634,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 分组排序 ──────────────────────────────────────────
-  app.get('/admin/group-order', async (c) => {
+  app.get('/ckadmin/group-order', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1642,7 +1642,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json(cfg);
   });
 
-  app.put('/admin/group-order', async (c) => {
+  app.put('/ckadmin/group-order', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1662,7 +1662,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 去重配置 ──────────────────────────────────────────
-  app.get('/admin/dedup-config', async (c) => {
+  app.get('/ckadmin/dedup-config', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1677,7 +1677,7 @@ export function createApp(deps: AppDeps): Hono {
     }
   });
 
-  app.put('/admin/dedup-config', async (c) => {
+  app.put('/ckadmin/dedup-config', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1708,7 +1708,7 @@ export function createApp(deps: AppDeps): Hono {
     }
   });
 
-  app.put('/admin/bg-settings', async (c) => {
+  app.put('/ckadmin/bg-settings', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -1749,12 +1749,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 直播禁用开关 ─────────────────────────────────────────
-  app.get('/admin/live-disabled', async (c) => {
+  app.get('/ckadmin/live-disabled', async (c) => {
     const raw = await storage.get(KV_LIVE_DISABLED);
     return c.json({ disabled: raw === 'true' });
   });
 
-  app.put('/admin/live-disabled', async (c) => {
+  app.put('/ckadmin/live-disabled', async (c) => {
     if (config.adminToken) {
       const auth = c.req.raw.headers.get('Authorization');
       if (auth !== `Bearer ${config.adminToken}`) return c.json({ error: 'Unauthorized' }, 401);
@@ -1768,12 +1768,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 直播合并模式 ─────────────────────────────────────────
-  app.get('/admin/live-merge-mode', async (c) => {
+  app.get('/ckadmin/live-merge-mode', async (c) => {
     const raw = await storage.get(KV_LIVE_MERGE_MODE);
     return c.json({ mode: raw || 'separated' });
   });
 
-  app.put('/admin/live-merge-mode', async (c) => {
+  app.put('/ckadmin/live-merge-mode', async (c) => {
     if (config.adminToken) {
       const auth = c.req.raw.headers.get('Authorization');
       if (auth !== `Bearer ${config.adminToken}`) return c.json({ error: 'Unauthorized' }, 401);
@@ -1789,12 +1789,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 智能 Base URL 开关 ──────────────────────────────────
-  app.get('/admin/smart-base-url', async (c) => {
+  app.get('/ckadmin/smart-base-url', async (c) => {
     const raw = await storage.get(KV_SMART_BASE_URL_ENABLED);
     return c.json({ enabled: raw === 'true' });
   });
 
-  app.put('/admin/smart-base-url', async (c) => {
+  app.put('/ckadmin/smart-base-url', async (c) => {
     if (config.adminToken) {
       const auth = c.req.raw.headers.get('Authorization');
       if (auth !== `Bearer ${config.adminToken}`) return c.json({ error: 'Unauthorized' }, 401);
@@ -1805,12 +1805,12 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 站点验活设置 ───────────────────────────────────────
-  app.get('/admin/site-probe-depth', async (c) => {
+  app.get('/ckadmin/site-probe-depth', async (c) => {
     const raw = await storage.get(KV_SITE_PROBE_DEPTH);
     return c.json({ depth: raw || 'deep' });
   });
 
-  app.put('/admin/site-probe-depth', async (c) => {
+  app.put('/ckadmin/site-probe-depth', async (c) => {
     if (config.adminToken) {
       const auth = c.req.raw.headers.get('Authorization');
       if (auth !== `Bearer ${config.adminToken}`) return c.json({ error: 'Unauthorized' }, 401);
@@ -1821,12 +1821,12 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, depth: body.depth });
   });
 
-  app.get('/admin/site-auto-clean', async (c) => {
+  app.get('/ckadmin/site-auto-clean', async (c) => {
     const raw = await storage.get(KV_SITE_AUTO_CLEAN);
     return c.json({ enabled: raw === 'true' });
   });
 
-  app.put('/admin/site-auto-clean', async (c) => {
+  app.put('/ckadmin/site-auto-clean', async (c) => {
     if (config.adminToken) {
       const auth = c.req.raw.headers.get('Authorization');
       if (auth !== `Bearer ${config.adminToken}`) return c.json({ error: 'Unauthorized' }, 401);
@@ -1836,7 +1836,7 @@ export function createApp(deps: AppDeps): Hono {
     return c.json({ success: true, enabled: body.enabled });
   });
 
-  app.get('/admin/site-health', async (c) => {
+  app.get('/ckadmin/site-health', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const raw = await storage.get(KV_SITE_HEALTH_MAP);
     const healthMap = raw ? JSON.parse(raw) : {};

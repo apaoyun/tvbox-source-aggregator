@@ -342,7 +342,7 @@ ${sharedStyles}
     </div>
     <h1 class="header-title">TVBox <span>Builder</span></h1>
     <div class="header-nav">
-      <a href="/admin">管理</a>
+      <a href="/ckadmin">管理</a>
       <a href="/config-editor">编辑器</a>
       <a href="/status">仪表盘</a>
     </div>

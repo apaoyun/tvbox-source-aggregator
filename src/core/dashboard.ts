@@ -338,8 +338,8 @@ ${sharedStyles}
       </div>
     </div>
     <nav class="header-nav">
-      <a href="/admin" data-i18n="navAdmin">Admin</a>
-      <a href="/admin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
+      <a href="/ckadmin" data-i18n="navAdmin">Admin</a>
+      <a href="/ckadmin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
       <a href="/builder">Builder</a>
     </nav>
   </header>
@@ -510,9 +510,9 @@ function doToggleLang() {
   loadStatus();
 }
 
-const configUrl = location.origin + '/live';
+const configUrl = location.origin + '/';
 $('configUrl').textContent = configUrl;
-$('liveConfigUrl').textContent = location.origin + '/live-apao';
+$('liveConfigUrl').textContent = location.origin + '/live-config';
 
 async function loadStatus() {
   try {

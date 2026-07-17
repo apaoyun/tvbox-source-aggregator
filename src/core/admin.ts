@@ -275,7 +275,7 @@ ${sharedStyles}
     </div>
     <h1 class="header-title">Source <span>Manager</span></h1>
     <nav class="header-nav">
-      <a href="/admin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
+      <a href="/ckadmin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
       <a href="/builder">Builder</a>
       <a href="/status" data-i18n="navDashboard">Dashboard</a>
     </nav>
@@ -854,7 +854,7 @@ function doToggleLang() {
 }
 
 // --- Auth ---
-const auth = initAuth('loginInput', 'loginError', 'loginOverlay', 'mainContent', '/admin/sources', loadAll);
+const auth = initAuth('loginInput', 'loginError', 'loginOverlay', 'mainContent', '/ckadmin/sources', loadAll);
 
 // --- Tab switching ---
 function switchTab(tab) {
@@ -925,7 +925,7 @@ async function loadStatus() {
 async function loadSources() {
   const list = $('sourceList');
   try {
-    const res = await auth.authFetch('/admin/sources');
+    const res = await auth.authFetch('/ckadmin/sources');
     const sources = await res.json();
     $('sourceCount').textContent = sources.length;
     $('badgeSources').textContent = sources.length;
@@ -974,7 +974,7 @@ async function addSource() {
   try {
     const payload = { name, url };
     if (configKey) payload.configKey = configKey;
-    const res = await auth.authFetch('/admin/sources', {
+    const res = await auth.authFetch('/ckadmin/sources', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -1000,7 +1000,7 @@ async function addSource() {
 // --- Remove source ---
 async function removeSource(url) {
   try {
-    const res = await auth.authFetch('/admin/sources', {
+    const res = await auth.authFetch('/ckadmin/sources', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
@@ -1021,7 +1021,7 @@ async function removeSource(url) {
 async function loadMacCMS() {
   const list = $('mcList');
   try {
-    const res = await auth.authFetch('/admin/maccms');
+    const res = await auth.authFetch('/ckadmin/maccms');
     const sources = await res.json();
     $('mcCount').textContent = sources.length;
     $('badgeMacCMS').textContent = sources.length;
@@ -1060,7 +1060,7 @@ async function addMacCMS() {
   btn.className = 'btn loading';
 
   try {
-    const res = await auth.authFetch('/admin/maccms', {
+    const res = await auth.authFetch('/ckadmin/maccms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key, name, api })
@@ -1083,7 +1083,7 @@ async function addMacCMS() {
 
 async function removeMC(key) {
   try {
-    const res = await auth.authFetch('/admin/maccms', {
+    const res = await auth.authFetch('/ckadmin/maccms', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key })
@@ -1096,7 +1096,7 @@ async function removeMC(key) {
 async function validateMC(api) {
   toast(t('testing'));
   try {
-    const res = await auth.authFetch('/admin/maccms/validate', {
+    const res = await auth.authFetch('/ckadmin/maccms/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api })
@@ -1114,7 +1114,7 @@ async function batchImportMacCMS() {
   if (!Array.isArray(data)) { toast(t('mustBeArray'), 'error'); return; }
 
   try {
-    const res = await auth.authFetch('/admin/maccms', {
+    const res = await auth.authFetch('/ckadmin/maccms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -1134,7 +1134,7 @@ async function batchImportMacCMS() {
 async function loadLives() {
   const list = $('liveList');
   try {
-    const res = await auth.authFetch('/admin/lives');
+    const res = await auth.authFetch('/ckadmin/lives');
     const entries = await res.json();
     $('liveCount').textContent = entries.length;
     $('badgeLive').textContent = entries.length;
@@ -1171,7 +1171,7 @@ async function addLive() {
   btn.className = 'btn loading';
 
   try {
-    const res = await auth.authFetch('/admin/lives', {
+    const res = await auth.authFetch('/ckadmin/lives', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, url })
@@ -1195,7 +1195,7 @@ async function addLive() {
 
 async function removeLive(url) {
   try {
-    const res = await auth.authFetch('/admin/lives', {
+    const res = await auth.authFetch('/ckadmin/lives', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
@@ -1217,7 +1217,7 @@ async function importConfig() {
   result.textContent = '';
 
   try {
-    const res = await auth.authFetch('/admin/sources/import', {
+    const res = await auth.authFetch('/ckadmin/sources/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ input })
@@ -1247,7 +1247,7 @@ async function importConfig() {
 // --- Name Transform ---
 async function loadNameTransform() {
   try {
-    const res = await auth.authFetch('/admin/name-transform');
+    const res = await auth.authFetch('/ckadmin/name-transform');
     if (!res.ok) return;
     const d = await res.json();
     $('ntPrefix').value = d.prefix || '';
@@ -1268,7 +1268,7 @@ async function saveNameTransform() {
   const extraCleanPatterns = extraRaw ? extraRaw.split('\\n').map(s => s.trim()).filter(Boolean) : [];
 
   try {
-    const res = await auth.authFetch('/admin/name-transform', {
+    const res = await auth.authFetch('/ckadmin/name-transform', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1299,7 +1299,7 @@ async function saveNameTransform() {
 // --- Cron Interval ---
 async function loadCronInterval() {
   try {
-    const res = await auth.authFetch('/admin/cron-interval');
+    const res = await auth.authFetch('/ckadmin/cron-interval');
     if (!res.ok) return;
     const d = await res.json();
     $('cronSelect').value = String(d.interval || 1440);
@@ -1314,7 +1314,7 @@ async function saveCronInterval() {
   status.textContent = '';
 
   try {
-    const res = await auth.authFetch('/admin/cron-interval', {
+    const res = await auth.authFetch('/ckadmin/cron-interval', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ interval: parseInt($('cronSelect').value) })
@@ -1340,7 +1340,7 @@ async function saveCronInterval() {
 // --- Speed Test Toggle ---
 async function loadSpeedTest() {
   try {
-    const res = await auth.authFetch('/admin/speed-test');
+    const res = await auth.authFetch('/ckadmin/speed-test');
     if (res.ok) {
       const d = await res.json();
       $('speedTestCheck').checked = d.enabled;
@@ -1354,7 +1354,7 @@ async function saveSpeedTest() {
   status.textContent = '';
 
   try {
-    const res = await auth.authFetch('/admin/speed-test', {
+    const res = await auth.authFetch('/ckadmin/speed-test', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ enabled })
@@ -1379,7 +1379,7 @@ async function saveSpeedTest() {
 async function loadChannelProbe() {
   const box = $('channelProbeStatus');
   try {
-    const res = await auth.authFetch('/admin/channel-probe/status');
+    const res = await auth.authFetch('/ckadmin/channel-probe/status');
     if (res.status === 404) {
       $('channelProbeSection').style.display = 'none';
       return;
@@ -1415,7 +1415,7 @@ async function loadChannelProbe() {
 async function toggleChannelProbe() {
   const enabled = $('channelProbeCheck').checked;
   try {
-    await auth.authFetch('/admin/channel-probe/toggle', {
+    await auth.authFetch('/ckadmin/channel-probe/toggle', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ enabled })
@@ -1431,7 +1431,7 @@ async function triggerChannelProbe() {
   const btn = $('channelProbeTriggerBtn');
   btn.disabled = true;
   try {
-    const res = await auth.authFetch('/admin/channel-probe/trigger', { method: 'POST' });
+    const res = await auth.authFetch('/ckadmin/channel-probe/trigger', { method: 'POST' });
     const d = await res.json();
     if (res.ok) {
       toast(t('channelProbeStarted'));
@@ -1449,7 +1449,7 @@ async function triggerChannelProbe() {
 // --- Edge Proxies ---
 async function loadEdgeProxies() {
   try {
-    const res = await auth.authFetch('/admin/edge-proxies');
+    const res = await auth.authFetch('/ckadmin/edge-proxies');
     if (res.ok) {
       const d = await res.json();
       $('edgeCfUrl').value = d.cf || '';
@@ -1461,7 +1461,7 @@ async function loadEdgeProxies() {
 async function saveEdgeProxies() {
   const status = $('edgeProxiesStatus');
   try {
-    const res = await auth.authFetch('/admin/edge-proxies', {
+    const res = await auth.authFetch('/ckadmin/edge-proxies', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cf: $('edgeCfUrl').value.trim(), vercel: $('edgeVercelUrl').value.trim() })
@@ -1486,7 +1486,7 @@ let sqPinnedKeys = new Set();
 
 async function loadSearchQuota() {
   try {
-    const res = await auth.authFetch('/admin/search-quota');
+    const res = await auth.authFetch('/ckadmin/search-quota');
     if (!res.ok) return;
     const d = await res.json();
     $('maxSearchableInput').value = d.maxSearchable;
@@ -1503,7 +1503,7 @@ async function saveSearchQuota() {
     pinnedKeys: [...sqPinnedKeys],
   };
   try {
-    const res = await auth.authFetch('/admin/search-quota', {
+    const res = await auth.authFetch('/ckadmin/search-quota', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -1524,7 +1524,7 @@ async function saveSearchQuota() {
 
 async function loadSearchQuotaReport() {
   try {
-    const res = await auth.authFetch('/admin/search-quota/report');
+    const res = await auth.authFetch('/ckadmin/search-quota/report');
     if (!res.ok) return;
     const d = await res.json();
     if (d.searchable == null) return;
@@ -1595,7 +1595,7 @@ async function movePinned(index, direction) {
   if (target < 0 || target >= arr.length) return;
   [arr[index], arr[target]] = [arr[target], arr[index]];
   try {
-    const res = await auth.authFetch('/admin/search-quota/pinned', {
+    const res = await auth.authFetch('/ckadmin/search-quota/pinned', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ keys: arr }),
@@ -1613,7 +1613,7 @@ function escHtml(s) { const d = document.createElement('div'); d.textContent = s
 async function togglePin(key) {
   const isPinned = sqPinnedKeys.has(key);
   try {
-    const res = await auth.authFetch('/admin/search-quota/pinned', {
+    const res = await auth.authFetch('/ckadmin/search-quota/pinned', {
       method: isPinned ? 'DELETE' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ keys: [key] }),
@@ -1663,7 +1663,7 @@ let cloudCredentials = {};
 
 async function loadCloudCredentials() {
   try {
-    const res = await auth.authFetch('/admin/cloud-credentials');
+    const res = await auth.authFetch('/ckadmin/cloud-credentials');
     if (!res.ok) return;
     const data = await res.json();
     cloudCredentials = data.credentials || {};
@@ -1716,7 +1716,7 @@ let qrPollTimer = null;
 
 async function startQRLogin(platform) {
   try {
-    const res = await auth.authFetch('/admin/cloud-login/' + platform + '/qr', { method: 'POST' });
+    const res = await auth.authFetch('/ckadmin/cloud-login/' + platform + '/qr', { method: 'POST' });
     if (!res.ok) { const e = await res.json(); toast(e.error || 'QR failed', 'error'); return; }
     const data = await res.json();
     showQRModal(platform, data.qrUrl, data.token);
@@ -1757,7 +1757,7 @@ function startQRPolling(platform, token) {
     if (attempts > maxAttempts) { closeQRModal(); toast('QR expired', 'error'); return; }
 
     try {
-      const res = await auth.authFetch('/admin/cloud-login/' + platform + '/poll?token=' + encodeURIComponent(token));
+      const res = await auth.authFetch('/ckadmin/cloud-login/' + platform + '/poll?token=' + encodeURIComponent(token));
       const data = await res.json();
       const statusEl = $('qrPollStatus');
       if (!statusEl) { clearInterval(qrPollTimer); return; }
@@ -1796,7 +1796,7 @@ async function showPasswordLogin(platform) {
   if (!password) return;
 
   try {
-    const res = await auth.authFetch('/admin/cloud-login/' + platform + '/password', {
+    const res = await auth.authFetch('/ckadmin/cloud-login/' + platform + '/password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
@@ -1816,7 +1816,7 @@ async function showPasswordLogin(platform) {
 async function logoutPlatform(platform) {
   if (!confirm('Logout ' + (PLATFORM_NAMES[platform]||platform) + '?')) return;
   try {
-    const res = await auth.authFetch('/admin/cloud-credentials/' + platform, { method: 'DELETE' });
+    const res = await auth.authFetch('/ckadmin/cloud-credentials/' + platform, { method: 'DELETE' });
     if (res.ok) {
       toast('Logged out', 'success');
       loadCloudCredentials();
@@ -1845,7 +1845,7 @@ async function manualPasteCredential() {
   }
 
   try {
-    const res = await auth.authFetch('/admin/cloud-credentials/' + platform, {
+    const res = await auth.authFetch('/ckadmin/cloud-credentials/' + platform, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ credential }),
@@ -1869,7 +1869,7 @@ async function loadRiskReport() {
   const summary = $('riskSummary');
 
   try {
-    const res = await auth.authFetch('/admin/credential-risk-report');
+    const res = await auth.authFetch('/ckadmin/credential-risk-report');
     if (!res.ok) { const e = await res.json(); toast(e.error || 'Failed', 'error'); return; }
     const data = await res.json();
 
@@ -1914,11 +1914,11 @@ async function loadRiskReport() {
 async function allowHighRisk(siteKey) {
   if (!confirm('Allow credential injection for "' + siteKey + '"? Your cookies may be sent to third-party servers.')) return;
   try {
-    const res = await auth.authFetch('/admin/credential-policy');
+    const res = await auth.authFetch('/ckadmin/credential-policy');
     const policy = await res.json();
     if (!policy.allowedHighRiskKeys) policy.allowedHighRiskKeys = [];
     if (!policy.allowedHighRiskKeys.includes(siteKey)) policy.allowedHighRiskKeys.push(siteKey);
-    await auth.authFetch('/admin/credential-policy', {
+    await auth.authFetch('/ckadmin/credential-policy', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(policy),
@@ -1932,10 +1932,10 @@ async function allowHighRisk(siteKey) {
 
 async function revokeHighRisk(siteKey) {
   try {
-    const res = await auth.authFetch('/admin/credential-policy');
+    const res = await auth.authFetch('/ckadmin/credential-policy');
     const policy = await res.json();
     policy.allowedHighRiskKeys = (policy.allowedHighRiskKeys||[]).filter(k => k !== siteKey);
-    await auth.authFetch('/admin/credential-policy', {
+    await auth.authFetch('/ckadmin/credential-policy', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(policy),
@@ -1950,7 +1950,7 @@ async function revokeHighRisk(siteKey) {
 // ─── 去重配置 ──────────────────────────────────────────────
 async function loadDedupConfig() {
   try {
-    const res = await auth.authFetch('/admin/dedup-config');
+    const res = await auth.authFetch('/ckadmin/dedup-config');
     const cfg = await res.json();
     $('similarDedupCheck').checked = cfg.similarDedup !== false;
     const pct = Math.round((cfg.similarDedupThreshold || 0.85) * 100);
@@ -1964,7 +1964,7 @@ async function saveDedupConfig() {
       similarDedup: $('similarDedupCheck').checked,
       similarDedupThreshold: parseInt($('dedupThreshold').value) / 100,
     };
-    const res = await auth.authFetch('/admin/dedup-config', {
+    const res = await auth.authFetch('/ckadmin/dedup-config', {
       method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(cfg)
     });
     if (res.ok) { $('dedupStatus').textContent = '✓'; setTimeout(() => $('dedupStatus').textContent = '', 2000); }
@@ -1975,7 +1975,7 @@ async function saveDedupConfig() {
 let groupRules = [];
 async function loadGroupOrder() {
   try {
-    const res = await auth.authFetch('/admin/group-order');
+    const res = await auth.authFetch('/ckadmin/group-order');
     const cfg = await res.json();
     $('groupOrderEnabled').checked = cfg.enabled;
     $('groupOrderUnmatched').value = cfg.unmatchedPosition || 'after';
@@ -2022,7 +2022,7 @@ async function saveGroupOrder() {
       unmatchedPosition: $('groupOrderUnmatched').value,
       rules: groupRules,
     };
-    const res = await auth.authFetch('/admin/group-order', {
+    const res = await auth.authFetch('/ckadmin/group-order', {
       method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(cfg)
     });
     if (res.ok) { $('groupOrderStatus').textContent = '✓'; setTimeout(() => $('groupOrderStatus').textContent = '', 2000); }
@@ -2038,7 +2038,7 @@ function onBgTypeChange() {
 }
 async function loadBgSettings() {
   try {
-    const res = await auth.authFetch('/admin/bg-settings');
+    const res = await auth.authFetch('/ckadmin/bg-settings');
     if (!res.ok) return;
     const cfg = await res.json();
     $('bgType').value = cfg.type || 'default';
@@ -2056,7 +2056,7 @@ async function saveBgSettings() {
       solidColor: $('bgSolidColor').value,
       gradient: $('bgGradient').value,
     };
-    const res = await auth.authFetch('/admin/bg-settings', {
+    const res = await auth.authFetch('/ckadmin/bg-settings', {
       method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(cfg)
     });
     if (res.ok) {
@@ -2070,7 +2070,7 @@ loadVersion();
 // ─── 聚合日志 ──────────────────────────────────────────────
 async function loadAggLogs() {
   try {
-    const res = await auth.authFetch('/admin/agg-logs?limit=50');
+    const res = await auth.authFetch('/ckadmin/agg-logs?limit=50');
     const data = await res.json();
     const logs = data.logs || [];
     if (logs.length === 0) {
@@ -2110,21 +2110,21 @@ async function loadAggLogs() {
 }
 async function clearAggLogs() {
   if (!confirm('Clear all aggregation logs?')) return;
-  await auth.authFetch('/admin/agg-logs', { method: 'DELETE' });
+  await auth.authFetch('/ckadmin/agg-logs', { method: 'DELETE' });
   loadAggLogs();
 }
 
 // ─── 直播禁用 ──────────────
 async function loadLiveDisabled() {
   try {
-    const r = await auth.authFetch('/admin/live-disabled');
+    const r = await auth.authFetch('/ckadmin/live-disabled');
     const d = await r.json();
     $('liveDisabledCheck').checked = d.disabled;
   } catch {}
 }
 async function saveLiveDisabled() {
   const disabled = $('liveDisabledCheck').checked;
-  await auth.authFetch('/admin/live-disabled', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({disabled}) });
+  await auth.authFetch('/ckadmin/live-disabled', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({disabled}) });
   $('liveDisabledStatus').textContent = '✓';
   setTimeout(() => $('liveDisabledStatus').textContent = '', 2000);
 }
@@ -2132,7 +2132,7 @@ async function saveLiveDisabled() {
 // ─── 直播合并模式 ──────────
 async function loadLiveMergeMode() {
   try {
-    const r = await auth.authFetch('/admin/live-merge-mode');
+    const r = await auth.authFetch('/ckadmin/live-merge-mode');
     const d = await r.json();
     const mode = d.mode || 'separated';
     $('liveMergeSeparated').classList.toggle('active', mode === 'separated');
@@ -2144,7 +2144,7 @@ async function setLiveMergeMode(mode) {
   $('liveMergeMerged').classList.toggle('active', mode === 'merged');
   $('liveMergeModeStatus').textContent = '⏳';
   try {
-    await auth.authFetch('/admin/live-merge-mode', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({mode}) });
+    await auth.authFetch('/ckadmin/live-merge-mode', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({mode}) });
     $('liveMergeModeStatus').textContent = '✓ 已切换并刷新';
     setTimeout(() => $('liveMergeModeStatus').textContent = '', 3000);
   } catch(e) {
@@ -2155,14 +2155,14 @@ async function setLiveMergeMode(mode) {
 // ─── 智能 Base URL ──────────
 async function loadSmartBaseUrl() {
   try {
-    const r = await auth.authFetch('/admin/smart-base-url');
+    const r = await auth.authFetch('/ckadmin/smart-base-url');
     const d = await r.json();
     $('smartBaseUrlCheck').checked = d.enabled;
   } catch {}
 }
 async function saveSmartBaseUrl() {
   const enabled = $('smartBaseUrlCheck').checked;
-  await auth.authFetch('/admin/smart-base-url', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled}) });
+  await auth.authFetch('/ckadmin/smart-base-url', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled}) });
   $('smartBaseUrlStatus').textContent = '✓';
   setTimeout(() => $('smartBaseUrlStatus').textContent = '', 2000);
 }
@@ -2170,14 +2170,14 @@ async function saveSmartBaseUrl() {
 // ─── 验活深度 ────────────────
 async function loadProbeDepth() {
   try {
-    const r = await auth.authFetch('/admin/site-probe-depth');
+    const r = await auth.authFetch('/ckadmin/site-probe-depth');
     const d = await r.json();
     $('probeDepthSelect').value = d.depth || 'deep';
   } catch {}
 }
 async function saveProbeDepth() {
   const depth = $('probeDepthSelect').value;
-  await auth.authFetch('/admin/site-probe-depth', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({depth}) });
+  await auth.authFetch('/ckadmin/site-probe-depth', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({depth}) });
   $('probeDepthStatus').textContent = '✓';
   setTimeout(() => $('probeDepthStatus').textContent = '', 2000);
 }
@@ -2185,14 +2185,14 @@ async function saveProbeDepth() {
 // ─── 自动清理 ────────────────
 async function loadAutoClean() {
   try {
-    const r = await auth.authFetch('/admin/site-auto-clean');
+    const r = await auth.authFetch('/ckadmin/site-auto-clean');
     const d = await r.json();
     $('autoCleanCheck').checked = d.enabled;
   } catch {}
 }
 async function saveAutoClean() {
   const enabled = $('autoCleanCheck').checked;
-  await auth.authFetch('/admin/site-auto-clean', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled}) });
+  await auth.authFetch('/ckadmin/site-auto-clean', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({enabled}) });
   $('autoCleanStatus').textContent = '✓';
   setTimeout(() => $('autoCleanStatus').textContent = '', 2000);
 }

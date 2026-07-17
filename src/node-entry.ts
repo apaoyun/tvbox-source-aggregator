@@ -208,7 +208,7 @@ async function main() {
     if (displayHost !== 'localhost') {
       console.log(`  > Network: http://${displayHost}:${info.port}/`);
     }
-    console.log(`  > Admin:   http://${displayHost}:${info.port}/admin`);
+    console.log(`  > Admin:   http://${displayHost}:${info.port}/ckadmin`);
     console.log(`  > Status:  http://${displayHost}:${info.port}/status`);
     console.log(`  > Cron:    ${currentSchedule} (every ${intervalLabel(intervalMin)})`);
     if (config.dockerMissingBaseUrl) {

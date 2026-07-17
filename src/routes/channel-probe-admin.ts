@@ -26,8 +26,8 @@ export interface ChannelProbeRouteDeps {
 export function mountChannelProbeRoutes(app: Hono, deps: ChannelProbeRouteDeps): void {
   const { storage, config } = deps;
 
-  // GET /admin/channel-probe/status — 查询状态 + 开关
-  app.get('/admin/channel-probe/status', async (c) => {
+  // GET /ckadmin/channel-probe/status — 查询状态 + 开关
+  app.get('/ckadmin/channel-probe/status', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     const [enabled, status] = await Promise.all([
       isProbeEnabled(storage),
@@ -40,8 +40,8 @@ export function mountChannelProbeRoutes(app: Hono, deps: ChannelProbeRouteDeps):
     });
   });
 
-  // PUT /admin/channel-probe/toggle — 开关
-  app.put('/admin/channel-probe/toggle', async (c) => {
+  // PUT /ckadmin/channel-probe/toggle — 开关
+  app.put('/ckadmin/channel-probe/toggle', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     let body: { enabled?: boolean };
     try {
@@ -56,8 +56,8 @@ export function mountChannelProbeRoutes(app: Hono, deps: ChannelProbeRouteDeps):
     return c.json({ success: true, enabled: body.enabled });
   });
 
-  // POST /admin/channel-probe/trigger — 手动触发（异步启动，不阻塞响应）
-  app.post('/admin/channel-probe/trigger', async (c) => {
+  // POST /ckadmin/channel-probe/trigger — 手动触发（异步启动，不阻塞响应）
+  app.post('/ckadmin/channel-probe/trigger', async (c) => {
     if (!verifyAdmin(c.req.raw, config)) return c.json({ error: 'Unauthorized' }, 401);
     if (isRunning()) {
       return c.json({ success: false, error: 'Already running' }, 409);
