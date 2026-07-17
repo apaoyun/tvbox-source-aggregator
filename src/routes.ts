@@ -283,6 +283,18 @@ export function createApp(deps: AppDeps): Hono {
   app.get('/ckadmin', (c) => {
     return c.html(adminHtml);
   });
+  
+    // ─── Admin 退出界面 ────────────────────────────────────────
+	
+	// 后台登出接口
+// 退出确认页面
+   app.get('/ckadmin/logout', (c) => {
+     const logoutPageHtml = `原来旧的页面代码`;
+  return c.html(logoutPageHtml);
+    });
+
+// ─── Admin API（需鉴权）────────────────────────────────
+app.get('/ckadmin/sources', async (c) => {
 
   // ─── Admin API（需鉴权）────────────────────────────────
   app.get('/ckadmin/sources', async (c) => {
