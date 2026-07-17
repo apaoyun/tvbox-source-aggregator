@@ -278,6 +278,8 @@ ${sharedStyles}
       <a href="/ckadmin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
       <a href="/builder">Builder</a>
       <a href="/status" data-i18n="navDashboard">Dashboard</a>
+	  <a href="/logout" data-i18n="navDashboard">logout</a>
+	  
     </nav>
     <!-- Aggregation status bar -->
     <div class="agg-bar">

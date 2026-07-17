@@ -345,6 +345,7 @@ ${sharedStyles}
       <a href="/ckadmin">管理</a>
       <a href="/config-editor">编辑器</a>
       <a href="/status">仪表盘</a>
+	  <a href="/logout">退出</a>
     </div>
   </header>
 
