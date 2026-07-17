@@ -114,7 +114,7 @@ export function createApp(deps: AppDeps): Hono {
   }
 
   // ─── 主配置 ────────────────────────────────────────────
-  app.get('/', async (c) => {
+  app.get('/live', async (c) => {
     let cached = await storage.get(KV_MERGED_CONFIG);
 
     if (!cached) {
@@ -136,7 +136,7 @@ export function createApp(deps: AppDeps): Hono {
   });
 
   // ─── 纯直播配置 ────────────────────────────────────────
-  app.get('/live-config', async (c) => {
+  app.get('/live-apao', async (c) => {
     let cached = await storage.get(KV_MERGED_CONFIG);
 
     if (!cached) {
