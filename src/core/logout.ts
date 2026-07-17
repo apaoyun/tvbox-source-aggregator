@@ -1,17 +1,9 @@
-// 后台页面
-app.get('/ckadmin', (c) => {
-  return c.html(adminHtml);
-});
-
-// 退出确认页面（统一主题）
-app.get('/ckadmin/logout-confirm', (c) => {
-  const logoutPageHtml = `
+const logoutPageHtml = `
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="${localStorage.getItem('theme')||'dark'}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>退出确认</title>
 <style>
 ${sharedStyles}
 .confirm-card{
@@ -20,7 +12,7 @@ ${sharedStyles}
   border-radius:12px;
   padding:32px;
   width:min(90%,420px);
-  box-shadow:0 10px 40px rgba(0,0,0,0.25);
+  box-shadow:0 10px 40px rgba(0,0,0.25);
 }
 .confirm-card h2{
   color:var(--text-bright);
@@ -88,33 +80,35 @@ const confirmBtn = document.getElementById('confirmBtn');
 cancelBtn.onclick = () => window.location.href = '/ckadmin';
 
 confirmBtn.onclick = async () => {
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = '处理中...';
   try {
-    await fetch('/ckadmin/logout', {
+    const res = await fetch('/ckadmin/logout', {
       method: 'POST',
       headers: {
         'Authorization': \`Bearer \${token}\`,
         'Content-Type': 'application/json'
       }
-    })
-  } catch (e) {}
-  localStorage.removeItem('adminToken');
-  alert('已成功退出登录');
-  window.location.href = '/';
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      localStorage.removeItem('adminToken');
+      alert('已成功退出登录');
+      window.location.href = '/';
+    } else {
+      alert(\`登出失败：\${data.error || '权限不足'}\`);
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = '确认退出';
+    }
+  } catch (err)
+    alert('网络请求异常，令牌未清除');
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = '确认退出';
+  }
 }
 </script>
 </body>
 </html>
-  `;
-  return c.html(logoutPageHtml);
-});
+`;
 
-// 登出接口（使用你现有的 verifyAdmin 鉴权）
-app.post('/ckadmin/logout', async (c) => {
-  const req = c.req.raw;
-  const cfg = c.env.APP_CONFIG;
-  const authorized = verifyAdmin(req, cfg);
-  if (!authorized) {
-    return c.json({ error: 'Unauthorized' }, 401);
-  }
-  return c.json({ success: true, msg: '登出完成' });
-});
+export { logoutPageHtml };
